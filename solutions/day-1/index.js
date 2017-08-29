@@ -18,12 +18,12 @@ const parseInput = (input) => {
         });
 };
 
-// Takes a direction and ensures it falls within 0-359.
+// Takes a direction and ensures it falls within 0 to 359.
 const wrapDirection = (direction) => {
     return (direction + (Math.abs(Math.floor(-450 / 360)) * 360)) % 360;
 };
 
-// Given a list of parsed instructions, returns the resulting direction, x, and y.
+// Given a list of parsed instructions, returns the resulting location.
 const getFinalLocation = (instructions) => {
     return _.reduce(instructions, (result, instruction) => {
         result.direction = wrapDirection(result.direction + instruction.direction);
@@ -47,6 +47,7 @@ const getFirstLocationVisitedTwice = (instructions) => {
 
         result.direction = wrapDirection(result.direction + instruction.direction);
 
+        // Record each step in history so we know if we've already visited it.
         _.times(instruction.steps, () => {
             if (result.history[result.x + "," + result.y])
                 return;
@@ -59,7 +60,6 @@ const getFirstLocationVisitedTwice = (instructions) => {
                 case 180: result.y += 1; break;
                 case 270: result.x -= 1; break;
             }
-
         });
 
         return result;
@@ -71,6 +71,7 @@ const getBlocksAway = (location) => {
     return Math.abs(location.x) + Math.abs(location.y)
 };
 
+// Display the results for both parts of the day.
 const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
     const instructions = parseInput(input);
