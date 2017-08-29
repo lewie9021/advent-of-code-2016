@@ -22,7 +22,7 @@ describe("Day 1:", () => {
         });
 
 
-        it("returns 2, given 'R5, L5, R5, R3'", () => {
+        it("returns 12, given 'R5, L5, R5, R3'", () => {
             const instructions = parseInput("R5, L5, R5, R3");
             const location = getFinalLocation(instructions);
 
