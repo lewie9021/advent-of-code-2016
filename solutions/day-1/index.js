@@ -24,7 +24,7 @@ const wrapDirection = (direction) => {
 };
 
 // Given a list of parsed instructions, returns the resulting direction, x, and y.
-const simulateInstrutions = (instructions) => {
+const getFinalLocation = (instructions) => {
     return _.reduce(instructions, (result, instruction) => {
         result.direction = wrapDirection(result.direction + instruction.direction);
 
@@ -39,21 +39,50 @@ const simulateInstrutions = (instructions) => {
     }, {direction: 0, x: 0, y: 0});
 }
 
-// Calculates the Manhattan distance.
-const getBlocksAway = (input) => {
-    const instructions = parseInput(input);
-    const result = simulateInstrutions(instructions)
+// Given a list of parsed instructions, returns the first location visited twice.
+const getFirstLocationVisitedTwice = (instructions) => {
+    return _.reduce(instructions, (result, instruction) => {
+        if (result.history[result.x + "," + result.y])
+            return result;
 
-    return Math.abs(result.x) + Math.abs(result.y);
+        result.direction = wrapDirection(result.direction + instruction.direction);
+
+        _.times(instruction.steps, () => {
+            if (result.history[result.x + "," + result.y])
+                return;
+
+            result.history[result.x + "," + result.y] = true;
+
+            switch (result.direction) {
+                case 0: result.y -= 1; break;
+                case 90: result.x += 1; break;
+                case 180: result.y += 1; break;
+                case 270: result.x -= 1; break;
+            }
+
+        });
+
+        return result;
+    }, {direction: 0, x: 0, y: 0, history: {}});
+}
+
+// Calculates the Manhattan distance.
+const getBlocksAway = (location) => {
+    return Math.abs(location.x) + Math.abs(location.y)
 };
 
 const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
+    const instructions = parseInput(input);
 
-    console.log("Part 1:", getBlocksAway(input));
-}
+    console.log("Part 1:", getBlocksAway(getFinalLocation(instructions))); // 146
+    console.log("Part 2", getBlocksAway(getFirstLocationVisitedTwice(instructions))); // 131
+};
 
 module.exports = {
+    parseInput,
+    getFinalLocation,
+    getFirstLocationVisitedTwice,
     getBlocksAway,
     run
 };
