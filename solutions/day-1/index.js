@@ -74,10 +74,10 @@ const getBlocksAway = (location) => {
 // Display the results for both parts of the day.
 const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
-    const instructions = parseInput(input);
+    const instructions = parseInput(input.trim());
 
     console.log("Part 1:", getBlocksAway(getFinalLocation(instructions))); // 146
-    console.log("Part 2", getBlocksAway(getFirstLocationVisitedTwice(instructions))); // 131
+    console.log("Part 2:", getBlocksAway(getFirstLocationVisitedTwice(instructions))); // 131
 };
 
 module.exports = {
