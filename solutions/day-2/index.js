@@ -3,11 +3,20 @@ const Path = require("path");
 
 const _ = require("lodash");
 
-const keypad = [
-    ["1", "2", "3"],
-    ["4", "5", "6"],
-    ["7", "8", "9"]
-];
+const keypads = {
+    v1: [
+      ["1", "2", "3"],
+      ["4", "5", "6"],
+      ["7", "8", "9"]
+    ],
+    v2: [
+      [null, null, "1", null, null],
+      [null,  "2", "3", "4",  null],
+      ["5",  "6",  "7",  "8",  "9"],
+      [null,  "A", "B", "C",  null],
+      [null, null, "D", null, null]
+    ]
+};
 
 // Parses the input so it can be processed easier.
 const parseInput = (input) => {
@@ -17,12 +26,12 @@ const parseInput = (input) => {
 };
 
 // Given an x and y location, returns the keypad value.
-const getKeypadValue = ({x, y}) => {
+const getKeypadValue = (keypad, {x, y}) => {
     return _.get(keypad, [y, x], null);
 };
 
 // Given a keypad value, returns the x and y location.
-const getKeypadLocation = (value) => {
+const getKeypadLocation = (keypad, value) => {
     for (let y = 0; y < keypad.length; y += 1) {
         const row = keypad[y];
 
@@ -38,25 +47,37 @@ const getKeypadLocation = (value) => {
 }
 
 // Given a starting value and an array of directions, returns a new keypad value.
-const getDigit = (startValue, directions) => {
+const getDigit = (keypad, startValue, directions) => {
     const endLocation = _.reduce(directions, (result, direction) => {
         switch (direction) {
-            case "U": result.y = Math.max(0, result.y - 1); break;
-            case "D": result.y = Math.min(2, result.y + 1); break;
-            case "L": result.x = Math.max(0, result.x - 1); break;
-            case "R": result.x = Math.min(2, result.x + 1); break;
+            case "U": 
+                if (getKeypadValue(keypad, {x: result.x, y: result.y - 1}))
+                    result.y -= 1;
+            break;
+            case "D":
+                if (getKeypadValue(keypad, {x: result.x, y: result.y + 1}))
+                    result.y += 1;
+            break;
+            case "L":
+                if (getKeypadValue(keypad, {x: result.x - 1, y: result.y}))
+                    result.x -= 1;
+            break;
+            case "R":
+                if (getKeypadValue(keypad, {x: result.x + 1, y: result.y}))
+                    result.x += 1;
+            break;
         }
 
         return result;
-    }, getKeypadLocation(startValue));
+    }, getKeypadLocation(keypad, startValue));
 
-    return getKeypadValue(endLocation);
+    return getKeypadValue(keypad, endLocation);
 }
 
 // Given a starting value and an array of instructions, returns the code.
-const getCode = (startValue, instructions) => {
+const getCode = (keypad, startValue, instructions) => {
     const result = _.reduce(instructions, (result, directions) => {
-        const digit = getDigit(result.currentValue, directions);
+        const digit = getDigit(keypad, result.currentValue, directions);
 
         result.code += digit;
         result.currentValue = digit
@@ -72,13 +93,14 @@ const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
     const instructions = parseInput(input.trim());
 
-    console.log("Part 1:", getCode("5", instructions));
-    console.log("Part 2:");
+    console.log("Part 1:", getCode(keypads.v1, "5", instructions));
+    console.log("Part 2:", getCode(keypads.v2, "5", instructions));
 };
 
 run();
 
 module.exports = {
+    keypads,
     parseInput,
     getCode,
     run
