@@ -93,11 +93,9 @@ const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
     const instructions = parseInput(input.trim());
 
-    console.log("Part 1:", getCode(keypads.v1, "5", instructions));
-    console.log("Part 2:", getCode(keypads.v2, "5", instructions));
+    console.log("Part 1:", getCode(keypads.v1, "5", instructions)); // 52981
+    console.log("Part 2:", getCode(keypads.v2, "5", instructions)); // 74CD2
 };
-
-run();
 
 module.exports = {
     keypads,
