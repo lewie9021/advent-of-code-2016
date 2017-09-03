@@ -1,7 +1,7 @@
 const { describe, it } = require("mocha");
 const { expect } = require("chai");
 
-const { parseInput, getValidTriangles } = require("./");
+const { parseInputHorizontally, parseInputVertically, getValidTriangles } = require("./");
 
 describe("Day 2:", () => {
 
@@ -9,7 +9,7 @@ describe("Day 2:", () => {
 
         it("returns an array of triangle side lengths", () => {
             const input = ["  5  10  25", "  40  20  35"].join("\n");
-            const triangles = parseInput(input);
+            const triangles = parseInputHorizontally(input);
             const expected = [[5, 10, 25], [40, 20, 35]];
 
             expect(triangles).to.eql(expected);
@@ -37,6 +37,27 @@ describe("Day 2:", () => {
     });
 
     describe("Part 2:", () => {
+
+        it("reads the list in column groups of 3", () => {
+            const input = [
+                "101 301 501",
+                "102 302 502",
+                "103 303 503",
+                "201 401 601",
+                "202 402 602",
+                "203 403 603"
+            ].join("\n");
+            const expected = [
+                [101, 102, 103],
+                [301, 302, 303],
+                [501, 502, 503],
+                [201, 202, 203],
+                [401, 402, 403],
+                [601, 602, 603]
+            ];
+
+            expect(parseInputVertically(input)).to.eql(expected);
+        })
 
     });
 
