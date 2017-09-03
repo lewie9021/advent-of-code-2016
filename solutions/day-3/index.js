@@ -44,7 +44,7 @@ const run = () => {
     const verticalTriangles = parseInputVertically(input.trim());
 
     console.log("Part 1:", getValidTriangles(horizontalTriangles).length); // 1050
-    console.log("Part 2:", getValidTriangles(verticalTriangles).length); //
+    console.log("Part 2:", getValidTriangles(verticalTriangles).length); // 1921
 };
 
 run();

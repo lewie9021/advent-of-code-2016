@@ -3,7 +3,7 @@ const { expect } = require("chai");
 
 const { parseInputHorizontally, parseInputVertically, getValidTriangles } = require("./");
 
-describe("Day 2:", () => {
+describe("Day 3:", () => {
 
     describe("Part 1:", () => {
 
