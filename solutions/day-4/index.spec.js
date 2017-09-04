@@ -1,7 +1,7 @@
 const { describe, it } = require("mocha");
 const { expect } = require("chai");
 
-const { parseInput, isRealRoom } = require("./");
+const { parseInput, isRealRoom, getSectorIDSumOfRealRooms, decryptName } = require("./");
 
 describe("Day 4:", () => {
 
@@ -29,12 +29,21 @@ describe("Day 4:", () => {
             const expected = [true, true, true, false];
 
             expect(rooms.map((room) => isRealRoom(room))).to.eql(expected);
-        })
+        });
 
+        it("returns the sectorID sum of 1514, given the example inputs", () => {
+            const rooms = parseInput(input);
+
+            expect(getSectorIDSumOfRealRooms(rooms)).to.eq(1514);
+        });
 
     });
 
     describe("Part 2:", () => {
+
+        it("decrypts 'qzmt-zixmtkozy-ivhz' with a sectorID of 343 as 'very encrypted name'", () => {
+            expect(decryptName("qzmt-zixmtkozy-ivhz", 343)).to.eq("very encrypted name");
+        });
 
     });
 

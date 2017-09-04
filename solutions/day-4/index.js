@@ -7,10 +7,10 @@ const _ = require("lodash");
 const parseInput = (input) => {
     return input
         .split("\n")
-        .map((room) => ({
-            encryptedName: room.match(/^(-?[a-z])+/)[0],
-            sectorID: parseInt(room.match(/\d+/)[0]),
-            checksum: room.match(/\[([a-z]+)\]/)[1]
+        .map((rawRoom) => ({
+            encryptedName: rawRoom.match(/^(-?[a-z])+/)[0],
+            sectorID: parseInt(rawRoom.match(/\d+/)[0]),
+            checksum: rawRoom.match(/\[([a-z]+)\]/)[1]
         }));
 };
 
@@ -55,19 +55,48 @@ const isRealRoom = (room) => {
     return room.checksum == checksum;
 };
 
+const getSectorIDSumOfRealRooms = (room) => {
+    return _.chain(room)
+        .filter((room) => isRealRoom(room))
+        .sumBy("sectorID")
+        .value();
+};
+
+const decryptName = (encryptedName, sectorID) => {
+    return _.chain(encryptedName)
+        .map((letter) => {
+            if (letter == "-")
+                return " "
+
+            const charCode = (letter.charCodeAt(0) + sectorID - 97) % 26;
+
+            return String.fromCharCode(charCode + 97);
+        })
+        .join("")
+        .value();
+};
+
+const findSectorIDByName = (rooms, name) => {
+    const match = _.find(rooms, (room) => {
+        return decryptName(room.encryptedName, room.sectorID) == name;
+    });
+
+    return _.get(match, "sectorID", null);
+}
+
 // Display the results for both parts of the day.
 const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
     const rooms = parseInput(input.trim());
 
-    console.log("Part 1:"); //
-    console.log("Part 2:"); //
+    console.log("Part 1:", getSectorIDSumOfRealRooms(rooms)); // 173787
+    console.log("Part 2:", findSectorIDByName(rooms, "northpole object storage")); // 548
 };
-
-run();
 
 module.exports = {
     parseInput,
     isRealRoom,
+    getSectorIDSumOfRealRooms,
+    decryptName,
     run
 };

@@ -47,8 +47,6 @@ const run = () => {
     console.log("Part 2:", getValidTriangles(verticalTriangles).length); // 1921
 };
 
-run();
-
 module.exports = {
     parseInputHorizontally,
     parseInputVertically,
