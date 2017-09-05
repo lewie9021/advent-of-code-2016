@@ -1,6 +1,6 @@
 const FS = require("fs");
 const Path = require("path");
-const Crypto = require("crypto")
+const Crypto = require("crypto");
 
 const _ = require("lodash");
 
