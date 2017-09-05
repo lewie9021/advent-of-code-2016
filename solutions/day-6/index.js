@@ -11,7 +11,7 @@ const parseInput = (input) => {
     return _.zipWith(...lines, (...characters) => characters);
 }
 
-const getMostCommonCharacter = (column) => {
+const getCharacterOccurences = (column) => {
     return _.chain(column)
         .reduce((result, character) => {
             result[character] = _.get(result, character, 0) + 1;
@@ -22,15 +22,28 @@ const getMostCommonCharacter = (column) => {
             character,
             count
         }))
+        .value();
+}
+
+const getMostCommonCharacter = (columns) => {
+    return _.chain(getCharacterOccurences(columns))
         .sortBy("count")
         .last()
         .get("character")
         .value();
 }
 
-const getErrorCorrectedMessage = (columns) => {
+const getLeastCommonCharacter = (columns) => {
+    return _.chain(getCharacterOccurences(columns))
+        .sortBy("count")
+        .first()
+        .get("character")
+        .value();
+}
+
+const getErrorCorrectedMessage = (columns, transformer) => {
     return columns
-        .map((column) => getMostCommonCharacter(column))
+        .map((column) => transformer(column))
         .join("");
 };
 
@@ -39,12 +52,14 @@ const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
     const columns = parseInput(input.trim());
 
-    console.log("Part 1:", getErrorCorrectedMessage(columns)); // qoclwvah
-    console.log("Part 2:"); //
+    console.log("Part 1:", getErrorCorrectedMessage(columns, getMostCommonCharacter)); // qoclwvah
+    console.log("Part 2:", getErrorCorrectedMessage(columns, getLeastCommonCharacter)); // ryrgviuv
 };
 
 module.exports = {
     parseInput,
     getErrorCorrectedMessage,
+    getMostCommonCharacter,
+    getLeastCommonCharacter,
     run
 };
