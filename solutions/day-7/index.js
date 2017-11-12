@@ -8,61 +8,125 @@ const parseInput = (input) => {
         .split("\n")
 
     return lines;
-}
+};
 
-const findAutonomousBridgeBypassAnnotation = (part) => {
-    if (part.length < 4)
-        return false;
+const getIsHypernetSequence = (rawPart) => {
+    return rawPart.startsWith("[") && rawPart.endsWith("]");
+};
 
-    for (let i = 0; i <= part.length - 4; i += 1) {
-        const [a, b, c, d] = part.substr(i, 4);
+const getRawParts = (ipAddress) => {
+    return ipAddress.match(/\[?([a-z]+)\]?/g);;
+};
+
+const getMatchingChunks = (part, chunkSize, predicate) => {
+    if (part.length < chunkSize)
+        return [];
+
+    let result = [];
+
+    for (let i = 0; i <= part.length - chunkSize; i += 1) {
+        const chunk = part.substr(i, chunkSize);
+
+        if (predicate(chunk, i)) {
+            result.push(chunk);
+
+            continue;
+        }
+    }
+
+    return result;
+};
+
+const getAutonomousBridgeBypassAnnotations = (part) => {
+    return getMatchingChunks(part, 4, (chunk) => {
+        const [a, b, c, d] = chunk;
 
         if (a == d && b == c && a != b && c != d)
             return true;
-    }
 
-    return false;
-}
-
-const getTransportLayerSnoopingSupport = (ipAddress) => {
-    const rawParts = ipAddress.match(/\[?([a-z]+)\]?/g);
-    const result = _.groupBy(rawParts, (rawPart) => {
-        const isHypernetSequence = rawPart.startsWith("[") && rawPart.endsWith("]");
-        const part = isHypernetSequence ? rawPart.substr(1, rawPart.length - 2) : rawPart;
-        const hasABBA = findAutonomousBridgeBypassAnnotation(part);
-
-        if (!hasABBA)
-            return "notFound";
-
-        if (isHypernetSequence)
-            return "invalid";
-
-        return "valid";
+        return false;
     });
-
-    return _.isEmpty(result.invalid) && !_.isEmpty(result.valid);
 };
 
-const getNumberOfTLSIPAddresses = (ipAddresses) => {
-    return _.reduce(ipAddresses, (result, ipAddress) => {
-        const isTLS = getTransportLayerSnoopingSupport(ipAddress);
+const getAreaBroadcastAccessors = (part) => {
+    return getMatchingChunks(part, 3, (chunk) => {
+        const [a, b, c] = chunk;
 
-        return result + (isTLS ? 1 : 0);
-    }, 0);
-}
+        if (a == c && b != a && b != c)
+            return true;
+
+        return false;
+    });
+};
+
+const getTransportLayerSnoopingSupport = (ipAddress) => {
+    const rawParts = getRawParts(ipAddress);
+
+    const {hypernet, supernet} = _.reduce(rawParts, (result, rawPart) => {
+        const isHypernetSequence = getIsHypernetSequence(rawPart);
+        const part = isHypernetSequence ? rawPart.substr(1, rawPart.length - 2) : rawPart;
+        const abbas = getAutonomousBridgeBypassAnnotations(part);
+
+        abbas.forEach((abba) => {
+            const sequence = isHypernetSequence ? "hypernet" : "supernet";
+
+            if (!result[sequence])
+                result[sequence] = [];
+
+            result[sequence].push(abba);
+        });
+
+        return result;
+    }, {});
+
+    return _.isEmpty(hypernet) && !_.isEmpty(supernet);
+};
+
+const getSuperSecretListeningSupport = (ipAddress) => {
+    const rawParts = getRawParts(ipAddress);
+
+    const {hypernet, supernet} = _.reduce(rawParts, (result, rawPart) => {
+        const isHypernetSequence = getIsHypernetSequence(rawPart);
+        const part = isHypernetSequence ? rawPart.substr(1, rawPart.length - 2) : rawPart;
+        const abas = getAreaBroadcastAccessors(part);
+
+        abas.forEach((aba) => {
+            const sequence = isHypernetSequence ? "hypernet" : "supernet";
+
+            if (!result[sequence])
+                result[sequence] = [];
+
+            result[sequence].push(aba);
+        });
+
+        return result;
+    }, {});
+
+    if (_.isEmpty(hypernet) || _.isEmpty(supernet))
+        return false;
+
+    const match = _.find(hypernet, (hypernetABA) => {
+        const [a, b, c] = hypernetABA.split("");
+        const hypernetBAB = [b, a, b].join("");
+
+        return _.includes(supernet, hypernetBAB);
+    });
+
+    return match ? true : false;
+};
 
 // Display the results for both parts of the day.
 const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
     const ipAddresses = parseInput(input.trim());
 
-    console.log("Part 1:", getNumberOfTLSIPAddresses(ipAddresses)); // 110.
+    console.log("Part 1:", _.filter(ipAddresses, getTransportLayerSnoopingSupport).length); // 110.
+    console.log("Part 2:", _.filter(ipAddresses, getSuperSecretListeningSupport).length); // 242.
 };
-
-run();
 
 module.exports = {
     parseInput,
     getTransportLayerSnoopingSupport,
+    getSuperSecretListeningSupport,
     run
 };
