@@ -4,10 +4,8 @@ const Path = require("path");
 const _ = require("lodash");
 
 const parseInput = (input) => {
-    const lines = input
-        .split("\n")
-
-    return lines;
+    return input
+        .split("\n");
 };
 
 const getIsHypernetSequence = (rawPart) => {
