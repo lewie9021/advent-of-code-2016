@@ -40,16 +40,42 @@ const explodeInput = (input) => {
     return result;
 };
 
+const explodeInputLength = (input) => {
+    const pattern = /([A-Z]+)|(\(\d+x\d+\)?)/gi;
+    let result = 0;
+    let matches;
+
+    while ((matches = pattern.exec(input)) !== null) {
+        const match = matches[0];
+        const marker = getMarker(match);
+
+        if (!marker) {
+            result += match.length;
+
+            continue;
+        }
+
+        const chunkLength = explodeInputLength(input.substr(pattern.lastIndex, marker.range));
+
+        result += chunkLength * marker.repeat;
+
+        pattern.lastIndex += marker.range;
+    }
+
+    return result;
+};
+
 // Display the results for both parts of the day.
 const run = () => {
     const input = FS.readFileSync(Path.join(__dirname, "input.txt"), "utf8");
     const text = input.trim();
 
-    console.log("Part 1:", explodeInput(text).length); // 112830
-    console.log("Part 2:"); //
+    console.log("Part 1:", explodeInput(text).length); // 112830.
+    console.log("Part 2:", explodeInputLength(text)); // 10931789799.
 };
 
 module.exports = {
     explodeInput,
+    explodeInputLength,
     run
 };
