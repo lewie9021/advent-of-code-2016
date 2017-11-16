@@ -3,7 +3,7 @@ const { expect } = require("chai");
 
 const { parseInput, explodeInput, explodeInputLength } = require("./");
 
-describe("Day 7:", function() {
+describe("Day 9:", function() {
 
     describe("Part 1:", function() {
 

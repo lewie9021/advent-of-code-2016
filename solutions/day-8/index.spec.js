@@ -3,7 +3,7 @@ const { expect } = require("chai");
 
 const { parseInput, generateScreen, executeInstructions } = require("./");
 
-describe("Day 7:", function() {
+describe("Day 8:", function() {
 
     describe("Part 1:", function() {
         const instructions = parseInput([
