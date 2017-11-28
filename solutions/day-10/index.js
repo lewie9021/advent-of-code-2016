@@ -150,8 +150,6 @@ const run = () => {
     console.log("Part 2:", outputs[0] * outputs[1] * outputs[2]); // 37789.
 };
 
-run();
-
 module.exports = {
     parseInput,
     executeInstructions,
